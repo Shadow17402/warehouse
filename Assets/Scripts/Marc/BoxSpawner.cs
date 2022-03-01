@@ -10,6 +10,7 @@ public class BoxSpawner : MonoBehaviour
     public float initialDelay, spawnDelay;
     public bool overflow = false;
     public Dataclass.lineType type;
+    public GameObject packets;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,7 +33,8 @@ public class BoxSpawner : MonoBehaviour
     public void SpawnObject()
 	{
         if (!overflow) { 
-        Instantiate(box, transform.position, transform.rotation);
+            GameObject spawnedBox = Instantiate(box, transform.position, transform.rotation);
+            spawnedBox.transform.parent = packets.transform;
         }
             
         if (!doSpawning)

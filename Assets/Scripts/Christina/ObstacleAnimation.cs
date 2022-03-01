@@ -17,7 +17,7 @@ public class ObstacleAnimation : MonoBehaviour
     // Update is called once per frame
     void Update () {
         Vector3 pos = transform.position;
-        pos.x = Mathf.Sin(Time.time * speed + randomOffset) * strength;
+        pos.x = (Mathf.Sin(Time.time * speed + randomOffset) * strength)+20;
         transform.position = pos;
     }
 }

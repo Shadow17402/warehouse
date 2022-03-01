@@ -10,24 +10,20 @@ public class DropPacket : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.tag == "Forklift"){
-            
-            
-            //if(packet.transform.position == hitboxShuttle.transform.position){
-                if(GameObject.Find("Forklift").GetComponent<ForkliftController>().active == true){
-                    print("it worked");
-                    packet.transform.parent = null;
-                    //GetComponent<Rigidbody>().useGravity = true;
-                    //packet.GetComponent<Rigidbody>().useGravity = true;
-                    packet.transform.position = onCube.transform.position;
-                    packet.transform.parent = GameObject.Find("TestCube").transform;
-                    var active = GameObject.Find("Forklift");
-                    active.GetComponent<ForkliftController>().SetActiveFalse();
-                }
-                
-               
-            
-            
+        if(other.gameObject.tag == "Shuttle"){
+            if (other.GetComponent<ForkliftController>().active == true)
+            {
+                packet = other.GetComponentInChildren<PacketStore>().getPacket();
+                other.GetComponentInChildren<PacketStore>().setPacket(null);
+                print("it worked");
+                //packet.transform.parent = null;
+                //GetComponent<Rigidbody>().useGravity = true;
+                //packet.GetComponent<Rigidbody>().useGravity = true;
+                packet.transform.position = onCube.transform.position;
+                packet.transform.parent = onCube.parent;
+                var active = GameObject.Find("Shuttle");
+                active.GetComponent<ForkliftController>().SetActiveFalse();
+            }
         }
 
     }

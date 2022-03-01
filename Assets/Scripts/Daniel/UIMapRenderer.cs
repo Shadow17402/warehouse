@@ -14,6 +14,12 @@ public class UIMapRenderer : Graphic
 
     public bool test = true;
 
+    private ArrayList shuttle = new ArrayList();
+    private ArrayList passable = new ArrayList();
+    private ArrayList obstacle = new ArrayList();
+
+    private Dictionary<Vector2,int> map2 = new Dictionary<Vector2,int>();
+
     protected override void Start()
     {
         map.Add(0, new ArrayList());  //Shuttle
@@ -27,18 +33,6 @@ public class UIMapRenderer : Graphic
 
         UIVertex vertex = UIVertex.simpleVert;
         vertex.color = color;
-        //bottom left
-        vertex.position = new Vector3(0, 0);
-        vh.AddVert(vertex);
-        //top left
-        vertex.position = new Vector3(0, 50);
-        vh.AddVert(vertex);
-        //top right
-        vertex.position = new Vector3(50, 50);
-        vh.AddVert(vertex);
-        //bottom right
-        vertex.position = new Vector3(50, 0);
-        vh.AddVert(vertex);
 
         //vh.AddTriangle(0, 1, 2);
         //vh.AddTriangle(2, 3, 0);
@@ -47,16 +41,29 @@ public class UIMapRenderer : Graphic
         float distanceSqr = widthSqr / 2;
         float distance = Mathf.Sqrt(distanceSqr);
 
+        //bottom left
+        vertex.position = new Vector3(0, 0);
+        vh.AddVert(vertex);
+        //top left
+        vertex.position = new Vector3(0, 50 + distance);
+        vh.AddVert(vertex);
+        //top right
+        vertex.position = new Vector3(50 + distance, 50 + distance);
+        vh.AddVert(vertex);
+        //bottom right
+        vertex.position = new Vector3(50 + distance, 0 - distance);
+        vh.AddVert(vertex);
+
         vertex.position = new Vector3(0 - distance,  0 - distance);
         vh.AddVert(vertex);
 
-        vertex.position = new Vector3(0 - distance, 50 - distance);
+        vertex.position = new Vector3(0 - distance, 50);
         vh.AddVert(vertex);
 
-        vertex.position = new Vector3(50 - distance, 50 - distance);
+        vertex.position = new Vector3(50, 50);
         vh.AddVert(vertex);
 
-        vertex.position = new Vector3(50 - distance, 0 - distance);
+        vertex.position = new Vector3(50, 0);
         vh.AddVert(vertex);
 
         //Left
@@ -94,7 +101,14 @@ public class UIMapRenderer : Graphic
             }
         }
 
-        foreach (Vector2 point in map[1])
+        map.Remove(0);
+        map.Remove(1);
+        map.Remove(2);
+        map.Add(0, shuttle);
+        map.Add(1, passable);
+        map.Add(2, obstacle);
+
+        /*foreach (Vector2 point in map[1])
         {
             drawSquare(new Vector2(point.x, point.y), vh, offset, 1);
             offset += 4;
@@ -106,6 +120,21 @@ public class UIMapRenderer : Graphic
             drawSquare(new Vector2(point.x, point.y), vh, offset, 2);
             offset += 4;
             Debug.Log(point.x + " " + point.y);
+        }
+
+        foreach (Vector2 point in map[0])
+        {
+            drawSquare(new Vector2(point.x, point.y), vh, offset, 0);
+            offset += 4;
+            Debug.Log(point.x + " " + point.y);
+        }*/
+
+        Debug.Log(map2.Keys.Count);
+
+        foreach(Vector2 key in map2.Keys)
+        {
+            drawSquare(key, vh, offset, map2[key]);
+            offset += 4;
         }
 
     }
@@ -148,28 +177,49 @@ public class UIMapRenderer : Graphic
         SetVerticesDirty();
     }
 
-    public void processScan(Vector3[] hits)
+    public void processScan(RaycastHit[] hits)
     {
-        ArrayList shuttle = new ArrayList();
-        ArrayList passable = new ArrayList();
-        ArrayList obstacle = new ArrayList();
-
-
+        Vector2 temp;
         //x=y z=x y=height
-        foreach(Vector3 hit in hits){
-            if (hit.y < 0.1)
+        foreach (RaycastHit hit in hits){
+            float rz = (float)Mathf.Round(hit.point.z * 10f) / 10f;
+            float rx = (float)Mathf.Round(hit.point.x * 10f) / 10f;
+            temp = new Vector2(50 - rz, rx);
+            if (hit.point.y < 0.1)
                 continue;
-            else if (hit.y < 1.85)
-                obstacle.Add(new Vector2(50-hit.z, hit.x));
-            else if (hit.y > 1.85)
-                passable.Add(new Vector2(50-hit.z, hit.x));
+            else if (hit.point.y < 1.85)
+            {
+                obstacle.Add(temp);
+                if (map2.TryGetValue(temp, out int value))
+                {
+                    if (value < 2)
+                    {
+                        map2.Remove(temp);
+                        map2.Add(temp, 2);
+                    }
+                }
+                else
+                {
+                    map2.Add(temp, 2);
+                }
+            }
+            else if (hit.point.y > 1.85)
+            {
+                passable.Add(temp);
+                if (map2.TryGetValue(temp, out int value))
+                {
+                    if (value < 2)
+                    {
+                        map2.Remove(temp);
+                        map2.Add(temp, 1);
+                    }
+                }
+                else
+                {
+                    map2.Add(temp, 1);
+                }
+            }
             
         }
-        map.Remove(1);
-        map.Remove(2);
-        map.Add(1, passable);
-        map.Add(2, obstacle);
-
-        SetVerticesDirty();
     }
 }

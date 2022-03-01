@@ -4,19 +4,20 @@ using UnityEngine;
 
 public class MappingSensor : MonoBehaviour
 {
-    private Vector3[] hits;
+    [SerializeField]
+    public RaycastHit[] hits;
     public UIMapRenderer renderer;
 
     private void Start()
     {
-        hits = new Vector3[MappingHelper.numViewDirections];
+        hits = new RaycastHit[MappingHelper.numViewDirections];
+        InvokeRepeating("rayCast", 0, 1);
     }
 
     // Update is called once per frame
     void Update()
     {
-        rayCast();
-        renderer.processScan(hits);
+
     }
 
 
@@ -34,11 +35,10 @@ public class MappingSensor : MonoBehaviour
                 if (Physics.SphereCast(ray, 0.25f, out hit, 200))
                 {
                     Debug.DrawLine(ray.origin, hit.point);
-                    Vector3 hit3 = hit.point;
                     /*hit3.y = hit3.x;
                     hit3.x = hit3.z;
                     hit3.z = 0;*/
-                    hits[i] = hit3;
+                    hits[i] = hit;
                 }
             }
             /*if (!Physics.SphereCast(ray, settings.boundsRadius, settings.collisionAvoidDst, settings.obstacleMask))
@@ -46,15 +46,16 @@ public class MappingSensor : MonoBehaviour
                 return dir;
             }*/
         }
+        renderer.processScan(hits);
     }
 
     public void OnDrawGizmosSelected()
     {
         if (Application.isPlaying)
         {
-            foreach(Vector3 hit in hits)
+            foreach(RaycastHit hit in hits)
             {
-                Gizmos.DrawSphere(hit - new Vector3(-100,0,0), 0.05f);
+                Gizmos.DrawSphere(hit.point - new Vector3(-100,0,0), 0.05f);
             }
 
         }

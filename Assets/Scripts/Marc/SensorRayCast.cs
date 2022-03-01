@@ -9,6 +9,8 @@ public class SensorRayCast : MonoBehaviour
 
     public Dataclass.lineType type;
     Dataclass data;
+    //Daniel
+    public GameObject pickup;
 
     // Start is called before the first frame update
     void Start()
@@ -24,10 +26,10 @@ public class SensorRayCast : MonoBehaviour
         var ray = new Ray(this.transform.position, this.transform.forward);
 
         RaycastHit box;
-        if(Physics.Raycast(ray, out box, 100))
+        if(Physics.Raycast(ray, out box, 2))
         {
-            
             lastHit = box.transform.gameObject;
+            pickup.GetComponent<Pickup>().setPackage(lastHit);
             data.changeLine(type, false);
         }
         else
