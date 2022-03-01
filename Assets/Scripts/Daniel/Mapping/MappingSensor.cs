@@ -38,7 +38,8 @@ public class MappingSensor : MonoBehaviour
                     /*hit3.y = hit3.x;
                     hit3.x = hit3.z;
                     hit3.z = 0;*/
-                    hits[i] = hit;
+                    if(hit.point.y<2.5)
+                        hits[i] = hit;
                 }
             }
             /*if (!Physics.SphereCast(ray, settings.boundsRadius, settings.collisionAvoidDst, settings.obstacleMask))

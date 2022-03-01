@@ -6,25 +6,17 @@ using UnityEngine.UI;
 public class UIMapRenderer : Graphic
 {
 
-    public Dictionary<int,ArrayList> map = new Dictionary<int, ArrayList>();
-
     public float thickness = 10f;
-
     public int offset = 0;
-
     public bool test = true;
+    public int updateCycles = 0;
 
-    private ArrayList shuttle = new ArrayList();
-    private ArrayList passable = new ArrayList();
-    private ArrayList obstacle = new ArrayList();
-
-    private Dictionary<Vector2,int> map2 = new Dictionary<Vector2,int>();
+    private Dictionary<Vector2,int> map = new Dictionary<Vector2,int>();
+    private Dictionary<Vector2, int> tempMap = new Dictionary<Vector2, int>();
 
     protected override void Start()
     {
-        map.Add(0, new ArrayList());  //Shuttle
-        map.Add(1, new ArrayList());  //Passable Obstacle
-        map.Add(2, new ArrayList());  //Obstacle
+        InvokeRepeating("updateMap", 0, 0.5f);
     }
 
     protected override void OnPopulateMesh(VertexHelper vh)
@@ -101,13 +93,6 @@ public class UIMapRenderer : Graphic
             }
         }
 
-        map.Remove(0);
-        map.Remove(1);
-        map.Remove(2);
-        map.Add(0, shuttle);
-        map.Add(1, passable);
-        map.Add(2, obstacle);
-
         /*foreach (Vector2 point in map[1])
         {
             drawSquare(new Vector2(point.x, point.y), vh, offset, 1);
@@ -129,14 +114,31 @@ public class UIMapRenderer : Graphic
             Debug.Log(point.x + " " + point.y);
         }*/
 
-        Debug.Log(map2.Keys.Count);
 
-        foreach(Vector2 key in map2.Keys)
+        foreach(Vector2 key in map.Keys)
         {
-            drawSquare(key, vh, offset, map2[key]);
+            drawSquare(key, vh, offset, map[key]);
             offset += 4;
         }
 
+        foreach (Vector2 key in tempMap.Keys)
+        {
+            Debug.Log(key);
+            drawSquare(key, vh, offset, tempMap[key]);
+            offset += 4;
+        }
+
+        updateCycles++;
+        if(updateCycles == 5)
+        {
+            updateCycles = 0;
+            clearTempMap();
+        }
+    }
+
+    public void clearTempMap()
+    {
+        tempMap.Clear();
     }
 
     public void toggleTest()
@@ -148,10 +150,8 @@ public class UIMapRenderer : Graphic
     {
         UIVertex vertex = UIVertex.simpleVert;
         if (map == 0)
-            vertex.color = Color.yellow;
-        else if(map == 1)
             vertex.color = Color.green;
-        else if (map == 2)
+        else if(map == 1)
             vertex.color = Color.black;
         else
             vertex.color = color;
@@ -172,7 +172,7 @@ public class UIMapRenderer : Graphic
         vh.AddTriangle(2 + offset, 3 + offset, 0 + offset);
     }
 
-    public void markDirty()
+    public void updateMap()
     {
         SetVerticesDirty();
     }
@@ -187,39 +187,33 @@ public class UIMapRenderer : Graphic
             temp = new Vector2(50 - rz, rx);
             if (hit.point.y < 0.1)
                 continue;
-            else if (hit.point.y < 1.85)
+            else if(hit.transform.gameObject.tag == "Human")
             {
-                obstacle.Add(temp);
-                if (map2.TryGetValue(temp, out int value))
+                if (tempMap.TryGetValue(temp, out int value))
+                {
+                    tempMap.Remove(temp);
+                    tempMap.Add(temp, 0);
+                }
+                else
+                {
+                    tempMap.Add(temp, 0);
+                }
+            }
+            else if (hit.point.y < 2.4)
+            {
+                if (map.TryGetValue(temp, out int value))
                 {
                     if (value < 2)
                     {
-                        map2.Remove(temp);
-                        map2.Add(temp, 2);
+                        map.Remove(temp);
+                        map.Add(temp, 1);
                     }
                 }
                 else
                 {
-                    map2.Add(temp, 2);
+                    map.Add(temp, 1);
                 }
             }
-            else if (hit.point.y > 1.85)
-            {
-                passable.Add(temp);
-                if (map2.TryGetValue(temp, out int value))
-                {
-                    if (value < 2)
-                    {
-                        map2.Remove(temp);
-                        map2.Add(temp, 1);
-                    }
-                }
-                else
-                {
-                    map2.Add(temp, 1);
-                }
-            }
-            
         }
     }
 }
