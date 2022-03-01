@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MappingHelper : MonoBehaviour
 {
-    public const int numViewDirections = 2500;
+    public const int numViewDirections = 1000;
     public static readonly Vector3[] directions;
 
     static MappingHelper()
