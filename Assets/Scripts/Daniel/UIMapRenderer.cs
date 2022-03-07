@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class UIMapRenderer : Graphic
 {
 
+    public Grid grid;
     public float thickness = 10f;
     public int offset = 0;
     public bool test = true;
@@ -26,35 +27,32 @@ public class UIMapRenderer : Graphic
         UIVertex vertex = UIVertex.simpleVert;
         vertex.color = color;
 
-        //vh.AddTriangle(0, 1, 2);
-        //vh.AddTriangle(2, 3, 0);
-
         float widthSqr = thickness * thickness;
         float distanceSqr = widthSqr / 2;
         float distance = Mathf.Sqrt(distanceSqr);
 
-        //bottom left
+        //bottom left 0
         vertex.position = new Vector3(0, 0);
         vh.AddVert(vertex);
-        //top left
-        vertex.position = new Vector3(0, 50 + distance);
+        //top left 1
+        vertex.position = new Vector3(0, 50);
         vh.AddVert(vertex);
-        //top right
+        //top right 2
         vertex.position = new Vector3(50 + distance, 50 + distance);
         vh.AddVert(vertex);
-        //bottom right
+        //bottom right 3
         vertex.position = new Vector3(50 + distance, 0 - distance);
         vh.AddVert(vertex);
-
+        //bottom left 4
         vertex.position = new Vector3(0 - distance,  0 - distance);
         vh.AddVert(vertex);
-
-        vertex.position = new Vector3(0 - distance, 50);
+        //top left 5
+        vertex.position = new Vector3(0 - distance, 50 + distance);
         vh.AddVert(vertex);
-
+        //top right 6
         vertex.position = new Vector3(50, 50);
         vh.AddVert(vertex);
-
+        //bottom right 7
         vertex.position = new Vector3(50, 0);
         vh.AddVert(vertex);
 
@@ -62,14 +60,14 @@ public class UIMapRenderer : Graphic
         vh.AddTriangle(0, 1, 5);
         vh.AddTriangle(5, 4, 0);
         //Top
-        vh.AddTriangle(1, 2, 6);
-        vh.AddTriangle(6, 5, 1);
+        vh.AddTriangle(5, 2, 6);
+        vh.AddTriangle(6, 1, 5);
         //Right
         vh.AddTriangle(2, 3, 7);
         vh.AddTriangle(7, 6, 2);
         //Bottom
-        vh.AddTriangle(3, 0, 4);
-        vh.AddTriangle(4, 7, 3);
+        vh.AddTriangle(0, 7, 3);
+        vh.AddTriangle(3, 4, 0);
 
         offset = 8;
         if (test)
@@ -93,27 +91,6 @@ public class UIMapRenderer : Graphic
             }
         }
 
-        /*foreach (Vector2 point in map[1])
-        {
-            drawSquare(new Vector2(point.x, point.y), vh, offset, 1);
-            offset += 4;
-            Debug.Log(point.x + " " + point.y);
-        }
-
-        foreach (Vector2 point in map[2])
-        {
-            drawSquare(new Vector2(point.x, point.y), vh, offset, 2);
-            offset += 4;
-            Debug.Log(point.x + " " + point.y);
-        }
-
-        foreach (Vector2 point in map[0])
-        {
-            drawSquare(new Vector2(point.x, point.y), vh, offset, 0);
-            offset += 4;
-            Debug.Log(point.x + " " + point.y);
-        }*/
-
 
         foreach(Vector2 key in map.Keys)
         {
@@ -123,7 +100,6 @@ public class UIMapRenderer : Graphic
 
         foreach (Vector2 key in tempMap.Keys)
         {
-            Debug.Log(key);
             drawSquare(key, vh, offset, tempMap[key]);
             offset += 4;
         }
@@ -156,16 +132,16 @@ public class UIMapRenderer : Graphic
         else
             vertex.color = color;
 
-        vertex.position = new Vector3(pos.x - 0.5f,pos.y - 0.5f);
+        vertex.position = new Vector3(pos.x - 0.3f, pos.y - 0.3f);
         vh.AddVert(vertex);
 
-        vertex.position = new Vector3(pos.x - 0.5f, pos.y + 0.5f);
+        vertex.position = new Vector3(pos.x - 0.3f, pos.y + 0.3f);
         vh.AddVert(vertex);
 
-        vertex.position = new Vector3(pos.x + 0.5f, pos.y + 0.5f);
+        vertex.position = new Vector3(pos.x + 0.3f, pos.y + 0.3f);
         vh.AddVert(vertex);
 
-        vertex.position = new Vector3(pos.x + 0.5f, pos.y - 0.5f);
+        vertex.position = new Vector3(pos.x + 0.3f, pos.y - 0.3f);
         vh.AddVert(vertex);
 
         vh.AddTriangle(0 + offset, 1 + offset, 2 + offset);
@@ -182,18 +158,18 @@ public class UIMapRenderer : Graphic
         Vector2 temp;
         //x=y z=x y=height
         foreach (RaycastHit hit in hits){
+            if (hit.point.y < 0.1)
+                continue;
+
+            grid.setUnwalkable(hit.point);
+
             float rz = (float)Mathf.Round(hit.point.z * 10f) / 10f;
             float rx = (float)Mathf.Round(hit.point.x * 10f) / 10f;
             temp = new Vector2(50 - rz, rx);
-            if (hit.point.y < 0.1)
-                continue;
-            else if(hit.transform.gameObject.tag == "Human")
+            
+            if(hit.transform.gameObject.tag == "Human")
             {
-                if (tempMap.TryGetValue(temp, out int value))
-                {
-                    tempMap.Remove(temp);
-                    tempMap.Add(temp, 0);
-                }
+                if (tempMap.ContainsKey(temp)) { }
                 else
                 {
                     tempMap.Add(temp, 0);
@@ -201,14 +177,7 @@ public class UIMapRenderer : Graphic
             }
             else if (hit.point.y < 2.4)
             {
-                if (map.TryGetValue(temp, out int value))
-                {
-                    if (value < 2)
-                    {
-                        map.Remove(temp);
-                        map.Add(temp, 1);
-                    }
-                }
+                if (map.ContainsKey(temp)) { }
                 else
                 {
                     map.Add(temp, 1);
