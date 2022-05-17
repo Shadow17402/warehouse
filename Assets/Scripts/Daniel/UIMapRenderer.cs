@@ -12,6 +12,7 @@ public class UIMapRenderer : Graphic
     public bool test = true;
     public int updateCycles = 0;
 
+    private List<Vector3> tempHuman = new List<Vector3>();
     private Dictionary<Vector2,int> map = new Dictionary<Vector2,int>();
     private Dictionary<Vector2, int> tempMap = new Dictionary<Vector2, int>();
 
@@ -70,27 +71,6 @@ public class UIMapRenderer : Graphic
         vh.AddTriangle(3, 4, 0);
 
         offset = 8;
-        if (test)
-        {
-            for (int i = 0; i < 50; i++)
-            {
-                drawSquare(new Vector2(i, 20), vh, offset, 0);
-                offset += 4;
-            }
-
-            for (int i = 0; i < 50; i++)
-            {
-                drawSquare(new Vector2(i, 10), vh, offset, 1);
-                offset += 4;
-            }
-
-            for (int i = 0; i < 50; i++)
-            {
-                drawSquare(new Vector2(i, 30), vh, offset, 2);
-                offset += 4;
-            }
-        }
-
 
         foreach(Vector2 key in map.Keys)
         {
@@ -108,6 +88,10 @@ public class UIMapRenderer : Graphic
         if(updateCycles == 5)
         {
             updateCycles = 0;
+            foreach (Vector3 v in tempHuman)
+            {
+                grid.setWalkable(v);
+            }
             clearTempMap();
         }
     }
@@ -115,11 +99,6 @@ public class UIMapRenderer : Graphic
     public void clearTempMap()
     {
         tempMap.Clear();
-    }
-
-    public void toggleTest()
-    {
-        test = !test;
     }
 
     public void drawSquare(Vector2 pos,VertexHelper vh,int offset,int map)
@@ -158,10 +137,8 @@ public class UIMapRenderer : Graphic
         Vector2 temp;
         //x=y z=x y=height
         foreach (RaycastHit hit in hits){
-            if (hit.point.y < 0.1)
+            if (hit.point.y < 0.1 || hit.transform.gameObject.tag == "Packet")
                 continue;
-
-            grid.setUnwalkable(hit.point);
 
             float rz = (float)Mathf.Round(hit.point.z * 10f) / 10f;
             float rx = (float)Mathf.Round(hit.point.x * 10f) / 10f;
@@ -169,6 +146,8 @@ public class UIMapRenderer : Graphic
             
             if(hit.transform.gameObject.tag == "Human")
             {
+                grid.setUnwalkable(hit.point);
+                tempHuman.Add(hit.point);
                 if (tempMap.ContainsKey(temp)) { }
                 else
                 {
@@ -177,6 +156,7 @@ public class UIMapRenderer : Graphic
             }
             else if (hit.point.y < 2.4)
             {
+                grid.setUnwalkable(hit.point);
                 if (map.ContainsKey(temp)) { }
                 else
                 {

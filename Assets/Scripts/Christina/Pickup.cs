@@ -14,7 +14,6 @@ public class Pickup : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Enter");
         if(other.gameObject.tag == "Shuttle"){
             Debug.Log(other);
             if (other.GetComponent<ForkliftController>().active == false){

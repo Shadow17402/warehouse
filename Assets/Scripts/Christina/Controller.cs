@@ -27,9 +27,9 @@ public class Controller : MonoBehaviour
         foreach(GameObject shuttle in shuttles){
             if(shuttle.GetComponent<ForkliftController>().active == false){
                 
-                MoveToPackage(outlet, shuttle);
+                //MoveToPackage(outlet, shuttle);
                 //await new WaitUntil(() => shuttle.GetComponent<ForkliftController>().active == true);
-                MovePackageToDest(dest, shuttle);
+                //MovePackageToDest(dest, shuttle);
                 //StartCoroutine(waiter(shuttle, dest));
                  /**while(shuttle.GetComponent<ForkliftController>().active == false);
                 {
@@ -46,12 +46,12 @@ public class Controller : MonoBehaviour
         
         
     }
-    public void MovePackageToDest(Vector3 dest, GameObject shuttle){
+    /*public void MovePackageToDest(Vector3 dest, GameObject shuttle){
         shuttle.GetComponent<ForkliftController>().MoveAgent(dest);
     }
     public void MoveToPackage(Vector3 outlet, GameObject shuttle){
          shuttle.GetComponent<ForkliftController>().MoveAgent(outlet);
-    }
+    }*/
     /**IEnumerator waiter(GameObject shuttle, Vector3 dest){
         
         yield return new WaitUntil(() => shuttle.GetComponent<ForkliftController>().active == true);

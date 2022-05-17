@@ -11,7 +11,7 @@ public class ForkliftController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+       /* if (Input.GetMouseButtonDown(0))
         {
           Ray ray = cam.ScreenPointToRay(Input.mousePosition);
           RaycastHit hit;
@@ -20,7 +20,7 @@ public class ForkliftController : MonoBehaviour
           {
               agent.SetDestination(hit.point);
           }
-        }
+        }*/
     }
 
     public void SetActiveTrue(){
@@ -29,7 +29,7 @@ public class ForkliftController : MonoBehaviour
     public void SetActiveFalse(){
         active = false;
     }
-    public void MoveAgent(Vector3 dest){
+    /*public void MoveAgent(Vector3 dest){
         agent.SetDestination(dest);
-    }
+    }*/
 }
